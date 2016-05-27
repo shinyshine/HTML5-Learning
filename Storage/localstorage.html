@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>localStorage</title>
+</head>
+<body>
+<script>
+	//setItem, getItem, removeItem, clear, localStorage.key(0)
+	//存数组，json，图片，脚本(不推荐 不利于SEO) 都要序列化成字符串  用的时候也要重新解析成可用的状态
+	/*
+		注意事项 
+		1. 使用前判断浏览器是否支持
+		2. 写数据的时候  需要异常处理 避免超出容量抛出错误    5M
+		3. 避免把敏感数据存入localStorage
+		4. key的唯一性
+	*/
+
+	/*
+		使用限制
+		1. 存储更新策略 过期控制
+		2. 子域名之间不能共享存储数据
+		3. 超出大小之后如何存储
+		4. server 端如何取到（cookie server可以访问）， server端无法拿到localStorage 只能跟在请求header后面传到server端
+
+	*/
+
+	/*
+		使用场景
+		1. 利用本地数据  减少网络传输
+		2. 弱网络环境下，高延迟，低带宽，尽量把数据本地化    
+		3. 脚本  样式 放本地 提高用户体验 版本不变就可以
+	*/
+
+	//下面是将图片通过canvas 的toDataURL转换成字符串序列存到localStorage的过程
+	//在控制台先调用set('image') , 再调用 get('image') 即可看到页面出现了一张图片
+	//这种存图片的方法的使用场景是：图片不经常改变 banner什么的
+	//跨域图片
+	var imgSrc = 'test.jpeg';
+	function set(key) {
+		var img = document.createElement('img');
+
+		img.addEventListener('load', function() {
+			var imgCanvas = document.createElement('canvas'),
+				imgContext = imgCanvas.getContext('2d');
+
+				imgCanvas.width = this.width;
+				imgCanvas.height = this.height;
+
+				imgContext.drawImage(this, 0, 0, this.width, this.height);
+
+				var imgAsDataURL = imgCanvas.toDataURL('image/jpeg');
+
+				try {
+					localStorage.setItem(key, imgAsDataURL);
+				}
+				catch(e) {
+					console.log('falied' + e);
+				}
+		})
+
+		img.src = imgSrc;
+	}
+
+	function get(key) {
+		var srcStr = localStorage.getItem(key);
+		var imgObj = document.createElement('img');
+		imgObj.src = srcStr;
+
+		document.body.appendChild(imgObj);
+	}
+
+
+</script>
+	
+</body>
+</html>
